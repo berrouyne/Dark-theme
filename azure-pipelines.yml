@@ -1,6 +1,5 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+# Docker Build and Push
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/languages/docker
 
 trigger:
 - main
@@ -11,19 +10,19 @@ resources:
 variables:
   tag: '$(Build.BuildId)'
 
-stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        tags: |
-          $(tag)
+jobs:
+- job: BuildAndPush
+  displayName: Build and Push Docker Image
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - task: Docker@2
+    displayName: Build and Push Image
+    inputs:
+      containerRegistry: 'acr66'   # Service Connection name in Azure DevOps
+      repository: 'your-repo-name' # Name of your image in ACR
+      command: 'buildAndPush'
+      Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+      tags: |
+        $(tag)
